@@ -1,4 +1,5 @@
-﻿
+﻿import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import { useEffect, useState } from 'react';
 import {
   collection,
@@ -42,7 +43,18 @@ function AdminDashboard() {
   const [verificationMessage, setVerificationMessage] = useState('');
 
   // LIVE FIREBASE TICKETS
+ 
+  // LIVE FIREBASE TICKETS
   useEffect(() => {
+    if (!isLoggedIn) {
+      setTickets([]);
+      setTicketsLoading(false);
+      return undefined;
+    }
+
+    setTicketsLoading(true);
+    setTicketsError('');
+
     const unsubscribe = onSnapshot(
       collection(db, 'tickets'),
       (snapshot) => {
@@ -62,8 +74,6 @@ function AdminDashboard() {
             status: data.status || 'NEW',
             location: data.location || data.room || 'Not provided',
             room: data.room || data.location || 'Not provided',
-
-            // Faculty form saves userEmail and userId.
             facultyName:
               data.facultyName ||
               data.userName ||
@@ -71,26 +81,29 @@ function AdminDashboard() {
               'Unknown faculty',
             facultyEmail: data.userEmail || '',
             facultyId: data.userId || '',
-
-            // Worker information from the faculty ticket.
             assignedTo:
-              data.assignedTo ||
-              data.assignedWorkerName ||
-              '',
+  data.assignedTo ||
+  data.assignedWorkerName ||
+  data.workerName ||
+  '',
+assignedWorkerName:
+  data.assignedWorkerName ||
+  data.assignedTo ||
+  data.workerName ||
+  '',
             assignedWorkerEmail: data.assignedWorkerEmail || '',
             assignedWorkerId: data.assignedWorkerId || '',
-
+            assignmentStatus:
+             data.assignmentStatus ||
+      (data.assignedTo || data.assignedWorkerName ? 'ASSIGNED' : 'UNASSIGNED'),
             dueDate: data.dueDate?.toDate
               ? data.dueDate.toDate().toLocaleDateString()
               : data.dueDate || 'Not set',
-
             adminResponse: data.adminResponse || '',
-
             aiRecommendation:
               typeof recommendation === 'object' && recommendation !== null
                 ? `Category: ${recommendation.category || '-'} | Department: ${recommendation.department || '-'} | Priority: ${recommendation.priority || '-'}`
                 : recommendation || 'No recommendation available',
-
             verifiedCategory:
               data.verifiedCategory || data.category || '',
             verifiedDepartment:
@@ -104,7 +117,6 @@ function AdminDashboard() {
         setTicketsLoading(false);
         setTicketsError('');
 
-        // Keep the open details panel synchronized with Firebase.
         setSelectedTicket((current) => {
           if (!current) return null;
           return (
@@ -115,16 +127,20 @@ function AdminDashboard() {
         });
       },
       (error) => {
-        console.error('Failed to load tickets:', error);
+        console.error(
+          'Failed to load tickets:',
+          error.code,
+          error.message
+        );
         setTicketsError(
-          'Could not load tickets. Check Firebase configuration and Firestore permissions.'
+          `Could not load tickets: ${error.code || error.message}`
         );
         setTicketsLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [isLoggedIn]);
 
   // SAVE CHANGES TO FIRESTORE
   const saveTicket = async (ticket, changes) => {
@@ -151,26 +167,39 @@ function AdminDashboard() {
     }
   };
 
-  const handleLogin = (event) => {
-    event.preventDefault();
+  const handleLogin = async (event) => {
+  event.preventDefault();
 
-    if (!email.trim() || !password.trim()) {
-      setLoginMessage('Please enter email and password.');
-      return;
-    }
+  if (!email.trim() || !password.trim()) {
+    setLoginMessage('Please enter email and password.');
+    return;
+  }
 
-    // This is the existing demo login behavior, not Firebase authentication.
+  try {
+    await signInWithEmailAndPassword(auth, email.trim(), password);
     setIsLoggedIn(true);
     setLoginMessage('');
     setPage('dashboard');
-  };
+  } catch (error) {
+    setLoginMessage('Login failed. Check your Firebase account details.');
+    console.error('Admin login error:', error);
+  }
+};
+   
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setEmail('');
-    setPassword('');
-    setSelectedTicket(null);
-    setPage('dashboard');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+      setEmail('');
+      setPassword('');
+      setSelectedTicket(null);
+      setPage('dashboard');
+      setLoginMessage('');
+    } catch (error) {
+      console.error('Admin logout error:', error);
+      setLoginMessage('Logout failed. Please try again.');
+    }
   };
 
   const openTicketDetails = (ticket) => {
@@ -844,7 +873,7 @@ function AdminDashboard() {
               <div className="detail-section">
                 <h3>Status Management</h3>
                 <select value={ticketStatus} onChange={handleStatusChange} disabled={saving}>
-                  {['NEW', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'OVERDUE', 'REOPENED'].map((status) => (
+                  {['NEW', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'CLOSED', 'OVERDUE', 'REOPENED'].map((status) => (
                     <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
@@ -887,6 +916,6 @@ function AdminDashboard() {
       </main>
     </div>
   );
-}
 
+}
 export default AdminDashboard;

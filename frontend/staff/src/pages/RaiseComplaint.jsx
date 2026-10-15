@@ -199,7 +199,7 @@ export default function RaiseComplaint() {
           assignedWorkerId: selectedWorker.id,
           assignedWorkerEmail: selectedWorker.email ?? "",
           assignmentStatus: "ASSIGNED",
-          status: "NEW",
+          status: "ASSIGNED",
           adminResponse: "",
           dueDate: null,
           resolvedDate: null,

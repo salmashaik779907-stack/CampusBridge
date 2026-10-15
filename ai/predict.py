@@ -52,7 +52,7 @@ def correct_department(complaint, predicted_department):
     text = normalize_complaint(complaint)
 
     electrical_words = [
-        "sparking"
+        "sparking"Get-ChildItem . -Recurse -Filter package.json -File -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notmatch 'node_modules|\.git' } | ForEach-Object { $_.FullName.Replace((Get-Location).Path + '\','') }
         "short circuit",
         "electrical",
         "wiring",

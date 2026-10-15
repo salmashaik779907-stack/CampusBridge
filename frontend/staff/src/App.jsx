@@ -1,8 +1,9 @@
-
+﻿
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard";
+import WorkerDashboard from "./pages/WorkerDashboard.jsx";
 import AdminDashboard from "./admin/AdminDashboard";
 import { auth } from "./firebase";
 
@@ -41,7 +42,7 @@ export default function App() {
   }
 
   if (user === undefined) {
-    return <p style={{ padding: 24 }}>Checking sign-in…</p>;
+    return <p style={{ padding: 24 }}>Checking sign-inâ€¦</p>;
   }
 
   if (!user) {
@@ -61,10 +62,12 @@ export default function App() {
         >
           Admin
         </button>
-        <Login onLogin={() => {}} />
+        <><button type="button" onClick={() => setView("worker")}>Worker</button><Login onLogin={() => {}} /></>
       </div>
     );
   }
 
+  if (view === "worker") return <WorkerDashboard user={user} />;
   return <Dashboard staff={{ uid: user.uid, email: user.email }} />;
 }
+
