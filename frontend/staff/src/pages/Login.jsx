@@ -6,17 +6,35 @@ import "./Login.css";
 export default function Login({ onLogin }) {
   const [staffId, setStaffId] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
  
-} catch (error) {
-  console.error("Sign-in failed:", error.code);
+  const [error, setError] = useState("");
 
-  setError(
-    error.code === "auth/network-request-failed"
-      ? "Sign-in is temporarily unavailable. Please try again shortly."
-      : "Unable to sign in with these details. Please check your email and password."
-  );
-}
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError("");
+
+    try {
+      const result = await signInWithEmailAndPassword(
+        auth,
+        staffId.trim(),
+        password
+      );
+
+      onLogin?.({
+        staffId: staffId.trim(),
+        uid: result.user.uid,
+        email: result.user.email,
+      });
+    } catch (error) {
+      console.error("Sign-in failed:", error.code);
+
+      setError(
+        error.code === "auth/network-request-failed"
+          ? "Sign-in is temporarily unavailable. Please try again shortly."
+          : "Unable to sign in with these details. Please check your email and password."
+      );
+    }
+  }
 
 
   return (
@@ -128,7 +146,7 @@ export default function Login({ onLogin }) {
               autoComplete="current-password"
               required
             />
-  
+          {error && <p role="alert">{error}</p>}
             <button className="cb-login-button" type="submit">
               Sign in to CampusBridge{" "}
               <span aria-hidden="true">→</span>
