@@ -1,0 +1,7 @@
+test_id,complaint,expected_category,actual_category,category_pass,expected_department,actual_department,department_pass,expected_priority,actual_priority,priority_pass,result,error
+4,Power failure has occurred in the laboratory.,Electrical,Electrical,True,Electrical,Electrical,True,HIGH,HIGH,True,PASS,
+13,Classroom fan is not working.,Classroom,Classroom,True,Electrical,Electrical,True,HIGH,HIGH,True,PASS,
+14,Washroom cleaning is required.,Other,Other,True,Housekeeping,Housekeeping,True,HIGH,HIGH,True,PASS,
+15,Mouse is not working in the computer lab.,IT / Computer,IT / Computer,True,IT Support,IT Support,True,LOW,LOW,True,PASS,
+16,No internet connection in the lab.,Internet / Wi-Fi,Internet / Wi-Fi,True,IT Support,IT Support,True,HIGH,HIGH,True,PASS,
+20,General office assistance is required.,Other,Other,True,Administration,Administration,True,LOW,LOW,True,PASS,

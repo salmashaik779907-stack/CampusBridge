@@ -1,0 +1,410 @@
+
+.cb-login-page {
+  --cb-maroon: #720d20;
+  --cb-dark-maroon: #430713;
+  --cb-gold: #e6bd70;
+  --cb-ink: #30252a;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 28px clamp(20px, 5vw, 76px) 20px;
+  color: white;
+  font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+  background-color: #54212a;
+  background-image: url("/ashoka-background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.cb-background-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(43, 5, 15, 0.91), rgba(64, 9, 22, 0.78) 42%, rgba(48, 7, 17, 0.45)), linear-gradient(0deg, rgba(35, 4, 12, 0.55), transparent 45%, rgba(35, 4, 12, 0.22));
+}
+
+.cb-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.cb-college-logo {
+  width: 62px;
+  height: 62px;
+  flex: 0 0 62px;
+  object-fit: contain;
+  padding: 5px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 5px 22px rgba(0, 0, 0, 0.16);
+}
+
+.cb-topbar-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cb-college-title {
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  line-height: 1.5;
+}
+
+.cb-topbar-subtitle {
+  color: #f0d9d9;
+  font-size: 12px;
+}
+
+.cb-login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 430px);
+  align-items: center;
+  gap: clamp(36px, 7vw, 100px);
+  width: 100%;
+  max-width: 1190px;
+  flex: 1;
+  margin: 30px auto;
+}
+
+.cb-welcome-panel {
+  max-width: 590px;
+  padding: 18px 0;
+}
+
+.cb-welcome-label {
+  display: inline-block;
+  margin-bottom: 23px;
+  padding: 9px 13px;
+  border: 1px solid rgba(230, 189, 112, 0.55);
+  border-radius: 5px;
+  color: #f2d59f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.cb-welcome-panel h1 {
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: clamp(36px, 4.8vw, 64px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -1.8px;
+}
+
+.cb-welcome-panel h1 span {
+  color: var(--cb-gold);
+}
+
+.cb-welcome-panel > p {
+  max-width: 480px;
+  margin: 22px 0 30px;
+  color: #f0e5e6;
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.cb-feature-list {
+  display: grid;
+  gap: 17px;
+}
+
+.cb-feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cb-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+  border: 1px solid rgba(230, 189, 112, 0.52);
+  border-radius: 10px;
+  color: #f2d59f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cb-feature > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cb-feature strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cb-feature > div > span {
+  color: #e7d7da;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cb-login-card {
+  width: 100%;
+  padding: clamp(26px, 3.3vw, 40px);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 20px;
+  color: var(--cb-ink);
+  background: rgba(255, 253, 251, 0.98);
+  box-shadow: 0 25px 80px rgba(25, 0, 8, 0.28);
+}
+
+.cb-card-emblem {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  margin-bottom: 23px;
+  border-radius: 14px;
+  color: white;
+  background: var(--cb-maroon);
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  box-shadow: 0 6px 15px rgba(114, 13, 32, 0.18);
+}
+
+.cb-card-eyebrow {
+  margin: 0 0 9px;
+  color: var(--cb-maroon);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.cb-login-card h2 {
+  margin: 0;
+  color: #30252a;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.cb-card-description {
+  margin: 10px 0 27px;
+  color: #756970;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.cb-login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.cb-login-form label {
+  margin-bottom: 8px;
+  color: #45343a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cb-login-form input {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 20px;
+  padding: 13px 14px;
+  border: 1px solid #e2d7d9;
+  border-radius: 9px;
+  outline: none;
+  color: #30252a;
+  background: #fff;
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cb-login-form input::placeholder {
+  color: #a69aa0;
+}
+
+.cb-login-form input:focus {
+  border-color: var(--cb-maroon);
+  box-shadow: 0 0 0 3px rgba(114, 13, 32, 0.09);
+}
+
+.cb-password-label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cb-login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 49px;
+  margin-top: 5px;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 9px;
+  color: white;
+  background: var(--cb-maroon);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 7px 18px rgba(114, 13, 32, 0.17);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.cb-login-button:hover {
+  background: var(--cb-dark-maroon);
+  transform: translateY(-1px);
+}
+
+.cb-login-button:focus-visible {
+  outline: 3px solid #d5a34e;
+  outline-offset: 3px;
+}
+
+.cb-login-button span {
+  color: #f2d59f;
+  font-size: 19px;
+}
+
+.cb-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 23px;
+  color: #786d72;
+  font-size: 11px;
+}
+
+.cb-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4d9b66;
+}
+
+.cb-prototype-note {
+  margin: 17px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid #eee5e7;
+  color: #93858b;
+  font-size: 10px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.cb-page-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  width: 100%;
+  max-width: 1320px;
+  margin: auto auto 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f0dfe2;
+  font-size: 11px;
+}
+
+.cb-page-footer span:first-child {
+  color: #f2d59f;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 850px) {
+  .cb-login-page {
+    padding: 22px 24px;
+  }
+
+  .cb-login-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    max-width: 500px;
+    margin: 32px auto;
+  }
+
+  .cb-welcome-panel {
+    padding: 0;
+  }
+
+  .cb-welcome-panel h1 {
+    font-size: clamp(36px, 7vw, 52px);
+  }
+
+  .cb-feature-list {
+    display: none;
+  }
+
+  .cb-welcome-panel > p {
+    margin-bottom: 0;
+  }
+
+  .cb-login-card {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cb-login-page {
+    padding: 18px 16px;
+  }
+
+  .cb-college-logo {
+    width: 49px;
+    height: 49px;
+    flex-basis: 49px;
+  }
+
+  .cb-college-title {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .cb-login-layout {
+    gap: 24px;
+    margin: 25px auto;
+  }
+
+  .cb-welcome-label {
+    margin-bottom: 15px;
+    font-size: 9px;
+  }
+
+  .cb-welcome-panel h1 {
+    font-size: 38px;
+    letter-spacing: -1px;
+  }
+
+  .cb-welcome-panel > p {
+    font-size: 13px;
+  }
+
+  .cb-login-card {
+    padding: 25px 21px;
+    border-radius: 16px;
+  }
+
+  .cb-login-card h2 {
+    font-size: 27px;
+  }
+
+  .cb-page-footer {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 10px;
+  }
+}

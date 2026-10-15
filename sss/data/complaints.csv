@@ -1,0 +1,122 @@
+complaint,category,department,priority
+Computer in Lab 1 is not turning on,IT / Computer,IT Support,HIGH
+Desktop computer shows a black screen,IT / Computer,IT Support,HIGH
+Keyboard is not working in the computer lab,IT / Computer,IT Support,MEDIUM
+Mouse is not responding on the faculty computer,IT / Computer,IT Support,MEDIUM
+Computer software is not opening,IT / Computer,IT Support,MEDIUM
+System is very slow in the computer lab,IT / Computer,IT Support,LOW
+Computer keeps restarting in the laboratory,IT / Computer,IT Support,HIGH
+Printer connected to the office computer is not working,IT / Computer,IT Support,MEDIUM
+Internet is not working in Room 204,Internet / Wi-Fi,IT Support,HIGH
+Wi-Fi connection is very slow in the classroom,Internet / Wi-Fi,IT Support,MEDIUM
+Campus Wi-Fi keeps disconnecting,Internet / Wi-Fi,IT Support,HIGH
+Unable to connect to college Wi-Fi,Internet / Wi-Fi,IT Support,MEDIUM
+Internet keeps disconnecting in the laboratory,Internet / Wi-Fi,IT Support,MEDIUM
+Network speed is low in the library,Internet / Wi-Fi,IT Support,LOW
+Wi-Fi is unavailable in the faculty room,Internet / Wi-Fi,IT Support,HIGH
+Classroom benches are damaged,Classroom,Maintenance,MEDIUM
+Classroom door is broken,Classroom,Maintenance,HIGH
+Classroom lights are not working,Classroom,Electrical,HIGH
+Classroom fan is not working,Classroom,Electrical,MEDIUM
+Classroom window is damaged,Classroom,Maintenance,MEDIUM
+Classroom furniture needs repair,Classroom,Maintenance,LOW
+Blackboard needs replacement,Classroom,Maintenance,LOW
+Tube light is not working in Room 302,Electrical,Electrical,MEDIUM
+Electrical switch is damaged,Electrical,Electrical,HIGH
+Power socket is not working,Electrical,Electrical,HIGH
+Classroom power supply is unavailable,Electrical,Electrical,HIGH
+Fan is making a strange noise,Electrical,Electrical,MEDIUM
+Electrical wiring needs inspection,Electrical,Electrical,MEDIUM
+Power outage in the laboratory,Electrical,Electrical,HIGH
+Water leakage is present in the classroom,Maintenance,Maintenance,HIGH
+Ceiling needs repair,Maintenance,Maintenance,HIGH
+Door handle is broken,Maintenance,Maintenance,MEDIUM
+Classroom wall needs repair,Maintenance,Maintenance,LOW
+Floor tiles are damaged,Maintenance,Maintenance,MEDIUM
+Water tap is leaking,Maintenance,Maintenance,MEDIUM
+Projector is not working in Room 204,Projector / Smart Board,IT Support,HIGH
+Projector display is blank,Projector / Smart Board,IT Support,HIGH
+Smart board is not responding,Projector / Smart Board,IT Support,HIGH
+Projector remote is not working,Projector / Smart Board,IT Support,MEDIUM
+Smart board display is unclear,Projector / Smart Board,IT Support,MEDIUM
+Projector cable is damaged,Projector / Smart Board,IT Support,MEDIUM
+Projector takes too long to start,Projector / Smart Board,IT Support,LOW
+Cleaning is required in the classroom,Other,Housekeeping,MEDIUM
+Classroom floor is dirty,Other,Housekeeping,LOW
+Washroom needs urgent cleaning,Other,Housekeeping,HIGH
+Garbage has not been collected,Other,Housekeeping,MEDIUM
+Need cleaning near the laboratory,Other,Housekeeping,LOW
+College office needs general assistance,Other,Administration,LOW
+Lost item needs to be reported,Other,Administration,LOW
+General campus issue needs attention,Other,Administration,MEDIUM
+Desktop computer not starting in Lab 2,IT / Computer,IT Support,HIGH
+Keyboard is damaged in computer lab,IT / Computer,IT Support,MEDIUM
+Mouse not working in Lab 3,IT / Computer,IT Support,LOW
+Computer system is very slow,IT / Computer,IT Support,MEDIUM
+Printer not working in office,IT / Computer,IT Support,MEDIUM
+Wi-Fi not available in Room 105,Internet / Wi-Fi,IT Support,HIGH
+Internet connection is slow,Internet / Wi-Fi,IT Support,MEDIUM
+Wi-Fi disconnecting frequently,Internet / Wi-Fi,IT Support,MEDIUM
+No internet connection in lab,Internet / Wi-Fi,IT Support,HIGH
+Network password assistance required,Internet / Wi-Fi,IT Support,LOW
+Broken bench in classroom,Classroom,Maintenance,MEDIUM
+Classroom door is damaged,Classroom,Maintenance,MEDIUM
+Board needs cleaning,Classroom,Housekeeping,LOW
+Classroom fan is not working,Classroom,Electrical,HIGH
+Chairs need repair in classroom,Classroom,Maintenance,MEDIUM
+Power failure in laboratory,Electrical,Electrical,HIGH
+Electrical switch is damaged,Electrical,Electrical,HIGH
+Tube light is not working,Electrical,Electrical,MEDIUM
+Fan is making unusual noise,Electrical,Electrical,MEDIUM
+Power socket is not working,Electrical,Electrical,HIGH
+Water tap is leaking,Maintenance,Maintenance,MEDIUM
+Ceiling leakage reported,Maintenance,Maintenance,HIGH
+Broken window needs repair,Maintenance,Maintenance,MEDIUM
+Door handle is broken,Maintenance,Maintenance,LOW
+Floor needs repair,Maintenance,Maintenance,MEDIUM
+Projector display is not working,Projector / Smart Board,IT Support,HIGH
+Smart board is not responding,Projector / Smart Board,IT Support,HIGH
+Projector remote is missing,Projector / Smart Board,IT Support,LOW
+Projector connection problem,Projector / Smart Board,IT Support,MEDIUM
+Smart board needs technical support,Projector / Smart Board,IT Support,MEDIUM
+Classroom needs cleaning,Other,Housekeeping,MEDIUM
+Washroom cleaning required,Other,Housekeeping,HIGH
+Corridor needs cleaning,Other,Housekeeping,LOW
+Dustbins need to be emptied,Other,Housekeeping,LOW
+General office assistance required,Other,Administration,LOW
+Main server is down,IT / Computer,IT Support,HIGH
+All computers in the lab are not working,IT / Computer,IT Support,HIGH
+College network is completely down,Internet / Wi-Fi,IT Support,HIGH
+Internet outage affecting the entire block,Internet / Wi-Fi,IT Support,HIGH
+Classroom cannot be used because of damaged infrastructure,Classroom,Maintenance,HIGH
+Electrical short circuit reported,Electrical,Electrical,HIGH
+Sparks coming from electrical socket,Electrical,Electrical,HIGH
+Major water leakage in classroom,Maintenance,Maintenance,HIGH
+Ceiling is leaking heavily,Maintenance,Maintenance,HIGH
+Projector failure during important examination,Projector / Smart Board,IT Support,HIGH
+Smart board completely stopped working during class,Projector / Smart Board,IT Support,HIGH
+Emergency cleaning required after water spill,Other,Housekeeping,HIGH
+One computer is not working,IT / Computer,IT Support,MEDIUM
+Printer is producing poor quality output,IT / Computer,IT Support,MEDIUM
+Internet is slow in one classroom,Internet / Wi-Fi,IT Support,MEDIUM
+Wi-Fi signal is weak in one area,Internet / Wi-Fi,IT Support,MEDIUM
+Some classroom benches need repair,Classroom,Maintenance,MEDIUM
+Classroom fan is making noise,Classroom,Electrical,MEDIUM
+One classroom light is not working,Electrical,Electrical,MEDIUM
+Water tap is leaking slowly,Maintenance,Maintenance,MEDIUM
+Window glass is damaged,Maintenance,Maintenance,MEDIUM
+Projector has connection problems,Projector / Smart Board,IT Support,MEDIUM
+Smart board sometimes stops responding,Projector / Smart Board,IT Support,MEDIUM
+Classroom requires routine cleaning,Other,Housekeeping,MEDIUM
+Computer mouse needs replacement,IT / Computer,IT Support,LOW
+Keyboard key is slightly damaged,IT / Computer,IT Support,LOW
+Need help connecting to Wi-Fi,Internet / Wi-Fi,IT Support,LOW
+Wi-Fi password assistance required,Internet / Wi-Fi,IT Support,LOW
+One classroom chair is uncomfortable,Classroom,Maintenance,LOW
+Board needs routine cleaning,Classroom,Housekeeping,LOW
+One light cover needs replacement,Electrical,Electrical,LOW
+Door handle is slightly loose,Maintenance,Maintenance,LOW
+Minor wall paint damage,Maintenance,Maintenance,LOW
+Projector remote needs replacement,Projector / Smart Board,IT Support,LOW
+Smart board calibration is needed,Projector / Smart Board,IT Support,LOW
+Dustbin needs routine emptying,Other,Housekeeping,LOW

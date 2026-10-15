@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Machine Learning
+*.pkl
+*.joblib
+
+# VS Code
+.vscode/
+
+#
+train_priority_v2.zip
+# Secrets and credentials
+.env.*
+!.env.example
+*service-account*.json
+firebase-adminsdk*.json
+secrets/
+CampusBridge-Secrets/
+
+# Dependencies and generated builds
+node_modules/
+dist/
+build/
+
+# Python environments
+.python-version
+# Python virtual environments anywhere
+**/venv/
+**/.venv/
+**/env/
+
+# Node dependencies and generated builds
+**/node_modules/
+**/dist/
+**/build/
+
+# Sensitive credentials
+.env
+.env.*
+!.env.example
+*service-account*.json
+firebase-adminsdk*.json
+secrets/
+CampusBridge-Secrets/
+
+# Python cache
+**/__pycache__/
+*.py[cod]
