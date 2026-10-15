@@ -1,18 +1,23 @@
-
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 import { useState } from "react";
 import "./Login.css";
 
 export default function Login({ onLogin }) {
   const [staffId, setStaffId] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+ 
+} catch (error) {
+  console.error("Sign-in failed:", error.code);
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  setError(
+    error.code === "auth/network-request-failed"
+      ? "Sign-in is temporarily unavailable. Please try again shortly."
+      : "Unable to sign in with these details. Please check your email and password."
+  );
+}
 
-    if (staffId.trim() && password.trim()) {
-      onLogin?.({ staffId: staffId.trim() });
-    }
-  }
 
   return (
     <main className="cb-login-page">
@@ -95,16 +100,20 @@ export default function Login({ onLogin }) {
           </p>
 
           <form onSubmit={handleSubmit} className="cb-login-form">
-            <label htmlFor="staffId">Staff ID</label>
-            <input
-              id="staffId"
-              type="text"
-              value={staffId}
-              onChange={(event) => setStaffId(event.target.value)}
-              placeholder="Enter your Staff ID"
-              autoComplete="username"
-              required
+            
+          <label htmlFor="email">College Email</label>
+
+            
+          <input
+            id="email"
+            type="email"
+            value={staffId}
+            onChange={(event) => setStaffId(event.target.value)}
+            placeholder="Enter your college email"
+            autoComplete="email"
+            required
             />
+
 
             <div className="cb-password-label">
               <label htmlFor="password">Password</label>
@@ -119,7 +128,7 @@ export default function Login({ onLogin }) {
               autoComplete="current-password"
               required
             />
-
+  
             <button className="cb-login-button" type="submit">
               Sign in to CampusBridge{" "}
               <span aria-hidden="true">→</span>

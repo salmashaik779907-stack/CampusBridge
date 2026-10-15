@@ -1,18 +1,22 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./admin/AdminDashboard";
+import { auth } from "./firebase";
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [staff, setStaff] = useState(null);
+  const [user, setUser] = useState(undefined);
   const [view, setView] = useState("faculty");
 
-  function handleLogin(credentials) {
-    setStaff(credentials);
-    setLoggedIn(true);
-  }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return unsubscribe;
+  }, []);
 
   if (view === "admin") {
     return (
@@ -31,13 +35,16 @@ export default function App() {
         >
           Back to Faculty
         </button>
-
         <AdminDashboard />
       </div>
     );
   }
 
-  if (!loggedIn) {
+  if (user === undefined) {
+    return <p style={{ padding: 24 }}>Checking sign-in…</p>;
+  }
+
+  if (!user) {
     return (
       <div>
         <button
@@ -54,11 +61,10 @@ export default function App() {
         >
           Admin
         </button>
-
-        <Login onLogin={handleLogin} />
+        <Login onLogin={() => {}} />
       </div>
     );
   }
 
-  return <Dashboard staff={staff} />;
+  return <Dashboard staff={{ uid: user.uid, email: user.email }} />;
 }
