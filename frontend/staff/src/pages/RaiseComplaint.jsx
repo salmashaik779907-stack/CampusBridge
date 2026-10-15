@@ -9,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://campusbridge-6g9g.onrender.com";
 
 const departments = [
   "IT Support",
