@@ -1,5 +1,7 @@
+
 from pathlib import Path
 import joblib
+import re
 
 
 # =========================
@@ -28,17 +30,17 @@ priority_model = joblib.load(
 
 
 # =========================
-# ML PREDICTION
+# TEXT NORMALIZATION
 # =========================
 
-def get_prediction_with_confidence(model, complaint):
+def normalize_complaint(complaint):
+    """Normalize complaint text for consistent keyword matching."""
+    return re.sub(r"\s+", " ", complaint.lower()).strip()
 
-    prediction = model.predict([complaint])[0]
-    probabilities = model.predict_proba([complaint])[0]
 
-    confidence = max(probabilities) * 100
-
-    return prediction, confidence
+def contains_any(text, keywords):
+    """Check whether any keyword or phrase is present."""
+    return any(word in text for word in keywords)
 
 
 # =========================
@@ -47,9 +49,10 @@ def get_prediction_with_confidence(model, complaint):
 
 def correct_department(complaint, predicted_department):
 
-    text = complaint.lower()
+    text = normalize_complaint(complaint)
 
     electrical_words = [
+        "sparking"
         "short circuit",
         "electrical",
         "wiring",
@@ -57,6 +60,7 @@ def correct_department(complaint, predicted_department):
         "socket",
         "voltage",
         "electric shock",
+        "sparking",
         "light",
         "bulb",
         "fan",
@@ -74,7 +78,9 @@ def correct_department(complaint, predicted_department):
         "furniture",
         "door",
         "window",
-        "ceiling"
+        "ceiling",
+        "broken desk",
+        "broken chair"
     ]
 
     it_words = [
@@ -90,7 +96,11 @@ def correct_department(complaint, predicted_department):
         "network",
         "system",
         "projector",
-        "smart board"
+        "smart board",
+        "server",
+        "login",
+        "password",
+        "website"
     ]
 
     housekeeping_words = [
@@ -99,21 +109,25 @@ def correct_department(complaint, predicted_department):
         "dustbin",
         "dirty",
         "washroom cleaning",
-        "toilet cleaning"
+        "toilet cleaning",
+        "classroom is dirty",
+        "classroom cleaning"
     ]
 
-    if any(word in text for word in electrical_words):
+    # Safety-related electrical problems take precedence.
+    if contains_any(text, electrical_words):
         return "Electrical"
 
-    if any(word in text for word in maintenance_words):
-        return "Maintenance"
-
-    if any(word in text for word in housekeeping_words):
+    if contains_any(text, housekeeping_words):
         return "Housekeeping"
 
-    if any(word in text for word in it_words):
+    if contains_any(text, maintenance_words):
+        return "Maintenance"
+
+    if contains_any(text, it_words):
         return "IT Support"
 
+    # Keep the ML prediction if no rule matches.
     return predicted_department
 
 
@@ -123,36 +137,62 @@ def correct_department(complaint, predicted_department):
 
 def correct_priority(complaint, predicted_priority):
 
-    text = complaint.lower()
+    text = normalize_complaint(complaint)
 
+    # HIGH: explicit danger or serious disruption.
     high_words = [
         "emergency",
         "urgent",
-        "major",
         "danger",
         "dangerous",
         "fire",
+        "smoke",
         "short circuit",
         "electric shock",
+        "sparking",
+        "gas leak",
+        "critical",
         "completely down",
-        "critical"
+        "exposed wire",
+        "electrical burning smell"
     ]
 
+    # LOW: explicitly minor and non-urgent problems.
     low_words = [
         "minor",
         "slight",
         "small issue",
-        "slowly",
         "not urgent",
-        "cosmetic"
+        "cosmetic",
+        "small scratch"
     ]
 
-    if any(word in text for word in high_words):
+    # MEDIUM: routine problems that affect normal work.
+    medium_words = [
+        "projector",
+        "computer",
+        "printer",
+        "wifi",
+        "wi-fi",
+        "internet",
+        "smart board",
+        "keyboard",
+        "mouse",
+        "classroom light",
+        "fan not working"
+    ]
+
+    # Safety risks must be checked first.
+    if contains_any(text, high_words):
         return "HIGH"
 
-    if any(word in text for word in low_words):
+    if contains_any(text, low_words):
         return "LOW"
 
+    if contains_any(text, medium_words):
+        return "MEDIUM"
+
+    # Use the trained model's result for other complaints.
     return predicted_priority
 
 
@@ -161,6 +201,11 @@ def correct_priority(complaint, predicted_priority):
 # =========================
 
 def predict_complaint(complaint):
+
+    if not isinstance(complaint, str) or not complaint.strip():
+        raise ValueError("Complaint must not be empty.")
+
+    complaint = complaint.strip()
 
     category, category_confidence = get_prediction_with_confidence(
         category_model,
@@ -216,30 +261,50 @@ def predict_complaint(complaint):
 
 
 # =========================
+# MODEL PREDICTION HELPER
+# =========================
+
+def get_prediction_with_confidence(model, complaint):
+
+    prediction = model.predict([complaint])[0]
+    probabilities = model.predict_proba([complaint])[0]
+
+    confidence = max(probabilities) * 100
+
+    return prediction, confidence
+
+
+# =========================
 # DIRECT TEST
 # =========================
 
 if __name__ == "__main__":
 
-    complaint = "Projector is not working in Room 204"
+    test_complaints = [
+        "Projector is not working in Room 204",
+        "The classroom projector is sparking",
+        "The classroom Wi-Fi is not working",
+        "The classroom is dirty and needs cleaning",
+        "There is water leakage from the ceiling",
+        "There is a short circuit in the classroom"
+    ]
 
-    result = predict_complaint(complaint)
+    for complaint in test_complaints:
 
-    print("CampusBridge AI Recommendation")
-    print("--------------------------------")
-    print("Complaint:", result["complaint"])
-    print()
-    print("Category:", result["category"])
-    print("Category Confidence:",
-          result["category_confidence"], "%")
-    print()
-    print("Department:", result["department"])
-    print("Department Confidence:",
-          result["department_confidence"], "%")
-    print()
-    print("Priority:", result["priority"])
-    print("Priority Confidence:",
-          result["priority_confidence"], "%")
-    print()
-    print("Human Verification Required:",
-          result["human_verification_required"])
+        result = predict_complaint(complaint)
+
+        print("\n" + "=" * 45)
+        print("CampusBridge AI Recommendation")
+        print("=" * 45)
+        print("Complaint:", result["complaint"])
+        print("Category:", result["category"])
+        print("Category Confidence:",
+              result["category_confidence"], "%")
+        print("Department:", result["department"])
+        print("Department Confidence:",
+              result["department_confidence"], "%")
+        print("Priority:", result["priority"])
+        print("Priority Confidence:",
+              result["priority_confidence"], "%")
+        print("Human Verification Required:",
+              result["human_verification_required"])
