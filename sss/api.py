@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -22,7 +22,8 @@ allow_origins=[
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "http://localhost:5175",
-     "http://localhost:5176"
+    "http://localhost:5176",
+    "http://127.0.0.1:5176",
     "https://campusbridge-staff-git-master-salmashaik779907-stack.vercel.app",
     "https://campusbridge-staff.vercel.app",
 ],
@@ -57,3 +58,5 @@ def predict(request: ComplaintRequest):
     result = predict_complaint(complaint)
 
     return result
+
+
