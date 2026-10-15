@@ -67,10 +67,8 @@ export default function RaiseComplaint() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          location: location.trim(),
-        }),
+  complaint: `${title.trim()}. ${description.trim()}. Location: ${location.trim()}`
+}),
       });
 
       if (!response.ok) {
