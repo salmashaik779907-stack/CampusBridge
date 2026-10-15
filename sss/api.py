@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-python -c "import firebase_admin, fastapi; print('Firebase Admin:', firebase_admin.__version__); print('FastAPI:', fastapi.__version__)"
 from pydantic import BaseModel
 
 from predict import predict_complaint
