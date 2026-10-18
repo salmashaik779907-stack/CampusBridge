@@ -1,5 +1,5 @@
-﻿import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth } from '../firebase';
+﻿
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import {
   collection,
@@ -8,8 +8,36 @@ import {
   updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 import './AdminDashboard.css';
+
+function getDateValue(value) {
+  if (!value) return null;
+
+  if (typeof value.toDate === 'function') {
+    return value.toDate();
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  if (typeof value === 'object' && value.seconds != null) {
+    return new Date(value.seconds * 1000);
+  }
+
+  return null;
+}
+
+function formatDueDate(value) {
+  const date = getDateValue(value);
+  return date ? date.toLocaleString() : 'Not set';
+}
 
 function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,9 +70,7 @@ function AdminDashboard() {
   const [responseMessage, setResponseMessage] = useState('');
   const [verificationMessage, setVerificationMessage] = useState('');
 
-  // LIVE FIREBASE TICKETS
- 
-  // LIVE FIREBASE TICKETS
+  // Load live tickets from Firestore.
   useEffect(() => {
     if (!isLoggedIn) {
       setTickets([]);
@@ -74,40 +100,59 @@ function AdminDashboard() {
             status: data.status || 'NEW',
             location: data.location || data.room || 'Not provided',
             room: data.room || data.location || 'Not provided',
+
             facultyName:
               data.facultyName ||
               data.userName ||
               data.userEmail ||
               'Unknown faculty',
+
             facultyEmail: data.userEmail || '',
             facultyId: data.userId || '',
+
             assignedTo:
-  data.assignedTo ||
-  data.assignedWorkerName ||
-  data.workerName ||
-  '',
-assignedWorkerName:
-  data.assignedWorkerName ||
-  data.assignedTo ||
-  data.workerName ||
-  '',
+              data.assignedTo ||
+              data.assignedWorkerName ||
+              data.workerName ||
+              '',
+
+            assignedWorkerName:
+              data.assignedWorkerName ||
+              data.assignedTo ||
+              data.workerName ||
+              '',
+
             assignedWorkerEmail: data.assignedWorkerEmail || '',
             assignedWorkerId: data.assignedWorkerId || '',
+
             assignmentStatus:
-             data.assignmentStatus ||
-      (data.assignedTo || data.assignedWorkerName ? 'ASSIGNED' : 'UNASSIGNED'),
-            dueDate: data.dueDate?.toDate
-              ? data.dueDate.toDate().toLocaleDateString()
-              : data.dueDate || 'Not set',
+              data.assignmentStatus ||
+              (data.assignedTo ||
+              data.assignedWorkerName ||
+              data.workerName
+                ? 'ASSIGNED'
+                : 'UNASSIGNED'),
+
+            // Preserve the original date for accurate comparisons.
+            dueDateValue: data.dueDate || null,
+
+            // Use this formatted value only for display.
+            dueDate: formatDueDate(data.dueDate),
+
             adminResponse: data.adminResponse || '',
+
             aiRecommendation:
-              typeof recommendation === 'object' && recommendation !== null
+              typeof recommendation === 'object' &&
+              recommendation !== null
                 ? `Category: ${recommendation.category || '-'} | Department: ${recommendation.department || '-'} | Priority: ${recommendation.priority || '-'}`
                 : recommendation || 'No recommendation available',
+
             verifiedCategory:
               data.verifiedCategory || data.category || '',
+
             verifiedDepartment:
               data.verifiedDepartment || data.department || '',
+
             verifiedPriority:
               data.verifiedPriority || data.priority || '',
           };
@@ -119,9 +164,11 @@ assignedWorkerName:
 
         setSelectedTicket((current) => {
           if (!current) return null;
+
           return (
             liveTickets.find(
-              (ticket) => ticket.firestoreId === current.firestoreId
+              (ticket) =>
+                ticket.firestoreId === current.firestoreId
             ) || current
           );
         });
@@ -132,9 +179,11 @@ assignedWorkerName:
           error.code,
           error.message
         );
+
         setTicketsError(
           `Could not load tickets: ${error.code || error.message}`
         );
+
         setTicketsLoading(false);
       }
     );
@@ -142,7 +191,25 @@ assignedWorkerName:
     return () => unsubscribe();
   }, [isLoggedIn]);
 
-  // SAVE CHANGES TO FIRESTORE
+  // A ticket is overdue if its deadline has passed and it
+  // has not been completed or closed.
+  const isTicketOverdue = (ticket) => {
+    if (['COMPLETED', 'CLOSED'].includes(ticket.status)) {
+      return false;
+    }
+
+    const dueDate = getDateValue(ticket.dueDateValue);
+
+    if (!dueDate) {
+      return ticket.status === 'OVERDUE';
+    }
+
+    return dueDate.getTime() < Date.now();
+  };
+
+  const overdueTickets = tickets.filter(isTicketOverdue);
+
+  // Save ticket updates to Firestore.
   const saveTicket = async (ticket, changes) => {
     if (!ticket?.firestoreId) {
       throw new Error('This ticket has no Firestore document ID.');
@@ -158,9 +225,11 @@ assignedWorkerName:
       });
     } catch (error) {
       console.error('Failed to update ticket:', error);
+
       setTicketsError(
         'Could not save changes. Check your internet connection and Firestore permissions.'
       );
+
       throw error;
     } finally {
       setSaving(false);
@@ -168,28 +237,36 @@ assignedWorkerName:
   };
 
   const handleLogin = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (!email.trim() || !password.trim()) {
-    setLoginMessage('Please enter email and password.');
-    return;
-  }
+    if (!email.trim() || !password.trim()) {
+      setLoginMessage('Please enter email and password.');
+      return;
+    }
 
-  try {
-    await signInWithEmailAndPassword(auth, email.trim(), password);
-    setIsLoggedIn(true);
-    setLoginMessage('');
-    setPage('dashboard');
-  } catch (error) {
-    setLoginMessage('Login failed. Check your Firebase account details.');
-    console.error('Admin login error:', error);
-  }
-};
-   
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+
+      setIsLoggedIn(true);
+      setLoginMessage('');
+      setPage('dashboard');
+    } catch (error) {
+      setLoginMessage(
+        'Login failed. Check your Firebase account details.'
+      );
+
+      console.error('Admin login error:', error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+
       setIsLoggedIn(false);
       setEmail('');
       setPassword('');
@@ -207,11 +284,16 @@ assignedWorkerName:
     setTicketStatus(ticket.status);
     setAssignedTo(ticket.assignedTo || '');
     setAdminResponse(ticket.adminResponse || '');
-    setVerifiedCategory(ticket.verifiedCategory || ticket.category);
+    setVerifiedCategory(
+      ticket.verifiedCategory || ticket.category
+    );
     setVerifiedDepartment(
       ticket.verifiedDepartment || ticket.department
     );
-    setVerifiedPriority(ticket.verifiedPriority || ticket.priority);
+    setVerifiedPriority(
+      ticket.verifiedPriority || ticket.priority
+    );
+
     setAssignedMessage('');
     setResponseMessage('');
     setVerificationMessage('');
@@ -225,7 +307,9 @@ assignedWorkerName:
     if (!selectedTicket) return;
 
     try {
-      await saveTicket(selectedTicket, { status: newStatus });
+      await saveTicket(selectedTicket, {
+        status: newStatus,
+      });
     } catch {
       setTicketStatus(selectedTicket.status);
     }
@@ -243,9 +327,11 @@ assignedWorkerName:
       await saveTicket(selectedTicket, {
         assignedTo: assignedTo.trim(),
         status: 'ASSIGNED',
+        assignmentStatus: 'ASSIGNED',
       });
 
       setTicketStatus('ASSIGNED');
+
       setAssignedMessage(
         `Ticket assigned to ${assignedTo.trim()} successfully.`
       );
@@ -266,6 +352,7 @@ assignedWorkerName:
       await saveTicket(selectedTicket, {
         adminResponse: adminResponse.trim(),
       });
+
       setResponseMessage('Admin response saved successfully.');
     } catch {
       setResponseMessage('Response could not be saved.');
@@ -292,11 +379,14 @@ assignedWorkerName:
         verifiedDepartment,
         verifiedPriority,
       });
+
       setVerificationMessage(
         'AI recommendation verification saved successfully.'
       );
     } catch {
-      setVerificationMessage('Verification could not be saved.');
+      setVerificationMessage(
+        'Verification could not be saved.'
+      );
     }
   };
 
@@ -328,13 +418,10 @@ assignedWorkerName:
       (!statusFilter || ticket.status === statusFilter) &&
       (!priorityFilter || ticket.priority === priorityFilter) &&
       (!categoryFilter || ticket.category === categoryFilter) &&
-      (!departmentFilter || ticket.department === departmentFilter)
+      (!departmentFilter ||
+        ticket.department === departmentFilter)
     );
   });
-
-  const overdueTickets = tickets.filter(
-    (ticket) => ticket.status === 'OVERDUE'
-  );
 
   const countStatus = (status) =>
     tickets.filter((ticket) => ticket.status === status).length;
@@ -344,7 +431,7 @@ assignedWorkerName:
   const assignedTickets = countStatus('ASSIGNED');
   const inProgressTickets = countStatus('IN_PROGRESS');
   const completedTickets = countStatus('COMPLETED');
-  const overdueCount = countStatus('OVERDUE');
+  const overdueCount = overdueTickets.length;
   const reopenedTickets = countStatus('REOPENED');
 
   const statusBadge = (status) => (
@@ -397,8 +484,10 @@ assignedWorkerName:
             alt="Ashoka Women's Engineering College"
             className="college-logo"
           />
+
           <h1>CampusBridge</h1>
           <h2>Admin Login</h2>
+
           <p className="login-subtitle">
             AI-Powered Smart Campus Issue Management System
           </p>
@@ -445,11 +534,13 @@ assignedWorkerName:
               alt="Ashoka Women's Engineering College"
               className="sidebar-logo"
             />
+
             <div>
               <h2>CampusBridge</h2>
               <p>Admin Panel</p>
             </div>
           </div>
+
           <span className="college-name">
             Ashoka Women's Engineering College
           </span>
@@ -481,7 +572,9 @@ assignedWorkerName:
       </aside>
 
       <main className="main-content">
-        {ticketsLoading && <p>Loading tickets from Firebase...</p>}
+        {ticketsLoading && (
+          <p>Loading tickets from Firebase...</p>
+        )}
 
         {ticketsError && (
           <p className="error-message" role="alert">
@@ -517,6 +610,7 @@ assignedWorkerName:
 
             <div className="dashboard-section">
               <h2>Recent Tickets</h2>
+
               <div className="table-container">
                 <table>
                   <thead>
@@ -533,8 +627,10 @@ assignedWorkerName:
                       <th>Due Date</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {ticketTableRows(tickets)}
+
                     {!ticketsLoading && tickets.length === 0 && (
                       <tr>
                         <td colSpan="10">
@@ -561,14 +657,18 @@ assignedWorkerName:
                 type="text"
                 placeholder="Search ID, title, faculty, worker, category..."
                 value={searchText}
-                onChange={(event) => setSearchText(event.target.value)}
+                onChange={(event) =>
+                  setSearchText(event.target.value)
+                }
               />
             </div>
 
             <div className="filters">
               <select
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value)
+                }
               >
                 <option value="">All Statuses</option>
                 {[
@@ -578,42 +678,64 @@ assignedWorkerName:
                   'COMPLETED',
                   'OVERDUE',
                   'REOPENED',
+                  'CLOSED',
                 ].map((status) => (
-                  <option key={status} value={status}>{status}</option>
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
                 ))}
               </select>
 
               <select
                 value={priorityFilter}
-                onChange={(event) => setPriorityFilter(event.target.value)}
+                onChange={(event) =>
+                  setPriorityFilter(event.target.value)
+                }
               >
                 <option value="">All Priorities</option>
                 {['HIGH', 'MEDIUM', 'LOW'].map((priority) => (
-                  <option key={priority} value={priority}>{priority}</option>
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
                 ))}
               </select>
 
               <select
                 value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
+                onChange={(event) =>
+                  setCategoryFilter(event.target.value)
+                }
               >
                 <option value="">All Categories</option>
-                {['Projector', 'Computer', 'Electrical'].map((category) => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
+                {['Projector', 'Computer', 'Electrical'].map(
+                  (category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  )
+                )}
               </select>
 
               <select
                 value={departmentFilter}
-                onChange={(event) => setDepartmentFilter(event.target.value)}
+                onChange={(event) =>
+                  setDepartmentFilter(event.target.value)
+                }
               >
                 <option value="">All Departments</option>
-                {['IT', 'Maintenance'].map((department) => (
-                  <option key={department} value={department}>{department}</option>
-                ))}
+                {['IT', 'IT Support', 'Maintenance'].map(
+                  (department) => (
+                    <option key={department} value={department}>
+                      {department}
+                    </option>
+                  )
+                )}
               </select>
 
-              <button className="clear-button" onClick={clearFilters}>
+              <button
+                className="clear-button"
+                onClick={clearFilters}
+              >
                 Clear Filters
               </button>
             </div>
@@ -634,8 +756,10 @@ assignedWorkerName:
                     <th>Due Date</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {ticketTableRows(filteredTickets)}
+
                   {filteredTickets.length === 0 && (
                     <tr>
                       <td colSpan="10">No tickets found.</td>
@@ -651,7 +775,10 @@ assignedWorkerName:
           <div>
             <div className="page-header">
               <h1>Overdue Tickets</h1>
-              <p>Tickets that require immediate attention</p>
+              <p>
+                Uncompleted tickets past their deadline, plus tickets
+                explicitly marked OVERDUE.
+              </p>
             </div>
 
             <div className="table-container">
@@ -668,17 +795,21 @@ assignedWorkerName:
                     <th>Due Date</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {overdueTickets.map((ticket) => (
                     <tr key={ticket.firestoreId}>
                       <td>
                         <button
                           className="ticket-link"
-                          onClick={() => openTicketDetails(ticket)}
+                          onClick={() =>
+                            openTicketDetails(ticket)
+                          }
                         >
                           {ticket.id}
                         </button>
                       </td>
+
                       <td>{ticket.title}</td>
                       <td>{ticket.facultyName}</td>
                       <td>{ticket.department}</td>
@@ -688,9 +819,13 @@ assignedWorkerName:
                       <td>{ticket.dueDate}</td>
                     </tr>
                   ))}
-                  {overdueTickets.length === 0 && (
+
+                  {!ticketsLoading && overdueTickets.length === 0 && (
                     <tr>
-                      <td colSpan="8">No overdue tickets.</td>
+                      <td colSpan="8">
+                        No overdue tickets. Tickets without a deadline
+                        cannot be automatically detected as overdue.
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -727,18 +862,31 @@ assignedWorkerName:
               <h2>Priority Summary</h2>
               {['HIGH', 'MEDIUM', 'LOW'].map((priority) => (
                 <p key={priority}>
-                  {priority}: {tickets.filter((ticket) => ticket.priority === priority).length}
+                  {priority}:{' '}
+                  {
+                    tickets.filter(
+                      (ticket) => ticket.priority === priority
+                    ).length
+                  }
                 </p>
               ))}
             </div>
 
             <div className="analytics-section">
               <h2>Department Summary</h2>
-              {['IT', 'Maintenance'].map((department) => (
-                <p key={department}>
-                  {department}: {tickets.filter((ticket) => ticket.department === department).length}
-                </p>
-              ))}
+              {['IT', 'IT Support', 'Maintenance'].map(
+                (department) => (
+                  <p key={department}>
+                    {department}:{' '}
+                    {
+                      tickets.filter(
+                        (ticket) =>
+                          ticket.department === department
+                      ).length
+                    }
+                  </p>
+                )
+              )}
             </div>
           </div>
         )}
@@ -752,6 +900,7 @@ assignedWorkerName:
 
             <div className="ticket-details-card">
               <h2>{selectedTicket.title}</h2>
+
               <p className="ticket-id">
                 Ticket ID: <strong>{selectedTicket.id}</strong>
               </p>
@@ -761,51 +910,69 @@ assignedWorkerName:
                   <strong>Faculty Name</strong>
                   <p>{selectedTicket.facultyName}</p>
                 </div>
+
                 <div>
                   <strong>Faculty Email</strong>
-                  <p>{selectedTicket.facultyEmail || 'Not provided'}</p>
+                  <p>
+                    {selectedTicket.facultyEmail || 'Not provided'}
+                  </p>
                 </div>
+
                 <div>
                   <strong>Faculty User ID</strong>
                   <p>{selectedTicket.facultyId || 'Not provided'}</p>
                 </div>
+
                 <div>
                   <strong>Category</strong>
                   <p>{selectedTicket.category}</p>
                 </div>
+
                 <div>
                   <strong>Department</strong>
                   <p>{selectedTicket.department}</p>
                 </div>
+
                 <div>
                   <strong>Priority</strong>
                   <p>{priorityBadge(selectedTicket.priority)}</p>
                 </div>
+
                 <div>
                   <strong>Current Status</strong>
                   <p>{statusBadge(ticketStatus)}</p>
                 </div>
+
                 <div>
                   <strong>Location / Room</strong>
                   <p>{selectedTicket.room}</p>
                 </div>
+
                 <div>
                   <strong>Due Date</strong>
                   <p>{selectedTicket.dueDate}</p>
                 </div>
+
                 <div>
                   <strong>Assigned Person</strong>
                   <p>{selectedTicket.assignedTo || 'Not assigned'}</p>
                 </div>
+
                 <div>
                   <strong>Assigned Person Email</strong>
-                  <p>{selectedTicket.assignedWorkerEmail || 'Not provided'}</p>
+                  <p>
+                    {selectedTicket.assignedWorkerEmail ||
+                      'Not provided'}
+                  </p>
                 </div>
               </div>
 
               <div className="detail-section">
                 <h3>Description</h3>
-                <p>{selectedTicket.description || 'No description provided.'}</p>
+                <p>
+                  {selectedTicket.description ||
+                    'No description provided.'}
+                </p>
               </div>
 
               <div className="detail-section">
@@ -815,83 +982,169 @@ assignedWorkerName:
 
               <div className="detail-section">
                 <h3>Verify AI Recommendation</h3>
-                <p>Review and save the verified category, department and priority.</p>
+                <p>
+                  Review and save the verified category, department
+                  and priority.
+                </p>
 
                 <div className="verification-grid">
                   <div>
                     <label>Verified Category</label>
-                    <select value={verifiedCategory} onChange={(event) => setVerifiedCategory(event.target.value)}>
+                    <select
+                      value={verifiedCategory}
+                      onChange={(event) =>
+                        setVerifiedCategory(event.target.value)
+                      }
+                    >
                       <option value="">Select Category</option>
-                      {['Projector', 'Computer', 'Electrical'].map((item) => (
-                        <option key={item} value={item}>{item}</option>
+                      {[
+                        'Projector',
+                        'Computer',
+                        'Electrical',
+                      ].map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
                       ))}
                     </select>
                   </div>
 
                   <div>
                     <label>Verified Department</label>
-                    <select value={verifiedDepartment} onChange={(event) => setVerifiedDepartment(event.target.value)}>
+                    <select
+                      value={verifiedDepartment}
+                      onChange={(event) =>
+                        setVerifiedDepartment(event.target.value)
+                      }
+                    >
                       <option value="">Select Department</option>
-                      {['IT', 'Maintenance'].map((item) => (
-                        <option key={item} value={item}>{item}</option>
+                      {[
+                        'IT',
+                        'IT Support',
+                        'Maintenance',
+                      ].map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
                       ))}
                     </select>
                   </div>
 
                   <div>
                     <label>Verified Priority</label>
-                    <select value={verifiedPriority} onChange={(event) => setVerifiedPriority(event.target.value)}>
+                    <select
+                      value={verifiedPriority}
+                      onChange={(event) =>
+                        setVerifiedPriority(event.target.value)
+                      }
+                    >
                       <option value="">Select Priority</option>
                       {['HIGH', 'MEDIUM', 'LOW'].map((item) => (
-                        <option key={item} value={item}>{item}</option>
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                <button className="action-button" onClick={handleVerification} disabled={saving}>
+                <button
+                  className="action-button"
+                  onClick={handleVerification}
+                  disabled={saving}
+                >
                   Save Verification
                 </button>
-                {verificationMessage && <p className="success-message">{verificationMessage}</p>}
+
+                {verificationMessage && (
+                  <p className="success-message">
+                    {verificationMessage}
+                  </p>
+                )}
               </div>
 
               <div className="detail-section">
                 <h3>Assign Ticket</h3>
+
                 <label>Assigned staff member / team</label>
                 <input
                   type="text"
                   placeholder="Enter staff person's name"
                   value={assignedTo}
-                  onChange={(event) => setAssignedTo(event.target.value)}
+                  onChange={(event) =>
+                    setAssignedTo(event.target.value)
+                  }
                 />
-                <button className="action-button" onClick={handleAssignment} disabled={saving}>
+
+                <button
+                  className="action-button"
+                  onClick={handleAssignment}
+                  disabled={saving}
+                >
                   Assign Ticket
                 </button>
-                {assignedMessage && <p className="success-message">{assignedMessage}</p>}
+
+                {assignedMessage && (
+                  <p className="success-message">
+                    {assignedMessage}
+                  </p>
+                )}
               </div>
 
               <div className="detail-section">
                 <h3>Status Management</h3>
-                <select value={ticketStatus} onChange={handleStatusChange} disabled={saving}>
-                  {['NEW', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'CLOSED', 'OVERDUE', 'REOPENED'].map((status) => (
-                    <option key={status} value={status}>{status}</option>
+
+                <select
+                  value={ticketStatus}
+                  onChange={handleStatusChange}
+                  disabled={saving}
+                >
+                  {[
+                    'NEW',
+                    'ASSIGNED',
+                    'IN_PROGRESS',
+                    'COMPLETED',
+                    'CLOSED',
+                    'OVERDUE',
+                    'REOPENED',
+                  ].map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
                   ))}
                 </select>
-                <p>Changes are saved to Firebase when you change the status.</p>
+
+                <p>
+                  Changes are saved to Firebase when you change the
+                  status.
+                </p>
               </div>
 
               <div className="detail-section">
                 <h3>Admin Response</h3>
+
                 <textarea
                   rows="5"
                   placeholder="Enter response for this ticket..."
                   value={adminResponse}
-                  onChange={(event) => setAdminResponse(event.target.value)}
+                  onChange={(event) =>
+                    setAdminResponse(event.target.value)
+                  }
                 />
-                <button className="action-button" onClick={handleAdminResponse} disabled={saving}>
+
+                <button
+                  className="action-button"
+                  onClick={handleAdminResponse}
+                  disabled={saving}
+                >
                   Save Response
                 </button>
-                {responseMessage && <p className="success-message">{responseMessage}</p>}
+
+                {responseMessage && (
+                  <p className="success-message">
+                    {responseMessage}
+                  </p>
+                )}
 
                 {selectedTicket.adminResponse && (
                   <div className="saved-response">
@@ -916,6 +1169,6 @@ assignedWorkerName:
       </main>
     </div>
   );
-
 }
+
 export default AdminDashboard;

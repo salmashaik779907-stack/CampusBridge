@@ -161,7 +161,7 @@ export default function RaiseComplaint() {
           (worker) =>
             worker.department === department &&
             worker.available === true &&
-            worker.isDemo === true
+            (worker.active === true || worker.isDemo === true)
         )
         .sort(
           (a, b) =>
@@ -473,3 +473,4 @@ const styles = {
     overflowWrap: "anywhere",
   },
 };
+
